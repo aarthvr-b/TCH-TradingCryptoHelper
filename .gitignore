@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.env
+
+# JSON log / database
+trades.json
+
+# IDE specific files (optional)
+.vscode/
+*.idea/
+
