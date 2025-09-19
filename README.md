@@ -101,7 +101,8 @@ Direction: long
 Exit price: 26000
 Note: TP hit.
 ```
-4. Biew trade history
-| ID | Pair    | Dir  | Status | Entry | Exit  | Net Pnl | Notes  |
-|----|---------|------|--------|-------|-------|---------|--------|
-| 1  | BTCUSDT | LONG | CLOSED | 25000 | 26000 | 99.00   | Tp hit |
+4. View trade history
+
+ID | Pair    | Dir  | Status | Entry | Exit  | Net Pnl | Notes  
+--- | --- | --- | --- | --- | --- | --- | ---
+ 1  | BTCUSDT | LONG | CLOSED | 25000 | 26000 | 99.00   | Tp hit 
