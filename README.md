@@ -1,92 +1,110 @@
-# TCH - Trading Crypto Helper
+# 💹 TCH — Trading Crypto Helper
 
-A python-based crypto trading helper tool for position sizing, leverage calculation and trade tracking.
-Designed for traders who want a **simple, reliable, and version-controlled** workflow for managing their trades.
+A **Textual-powered TUI** app to manage your crypto trades, calculate position size, and track performance.  
+Built for traders who want a **lightweight**, **keyboard-driven**, and **risk-aware** workflow right from the terminal.
 
 ---
 
-## Features
+## 🚀 Features
 
-- Calculate **position size** based on account size, risk percentage, entry, and stop loss.
-- Automatically suggest **leverage** if you capital is insufficient.
-- Track **long and short trades**.
-- Log **entry, exit, PnL, fees, and notes** for each trade.
-- Store trade history in **JSON** format.
-- Color-coded trade history in the terminal using **Rich**.
-- Confirmation step to **avoid input mistakes** before opening a trade.
-- Easy to extend with **TUI / GUI** in the future.
+- 📈 **Position Size Calculator**  
+  Calculates how much to trade based on account size, risk %, entry, and stop loss.  
 
---- 
+- ⚙️ **Leverage Suggestion**  
+  Automatically recommends required leverage when your account balance is insufficient.
 
-## Requirements
+- 💰 **Trade Management**  
+  Open, close, and delete trades — each stored persistently in a JSON log.
+
+- 📊 **Interactive Trade History**  
+  View all trades in a rich DataTable with PnL, notes, and easy navigation.
+
+- 🧮 **PnL & Fee Calculation**  
+  Automatically computes maker/taker fees and net profit/loss.
+
+- 🧱 **Persistent Storage**  
+  All trades are saved in `trades.json` (auto-created).
+
+- 💬 **Popups & Confirmations**  
+  Smart popup messages for validation, success/failure, and deletion confirmation.
+
+- ⌨️ **Keyboard-Driven UX**  
+  Navigate, confirm, and delete trades entirely from your keyboard.
+
+---
+
+## 🧰 Requirements
 
 - Python 3.10+
-- [Rich](https://pypi.org/project/rich/) (`pip install rich`)
+- [Textual](https://textual.textualize.io/)
+- [Rich](https://pypi.org/project/rich/)
 
-Optional: use a virtual environment to isolate dependencies.
-
----
-
-## Setup
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/aarthvr-b/TCH-TradingCryptoHelper.git
-cd TCH-TradingCryptoHelper
-```
-2. Create and activate a virtual environment (recommended):
-
-```bash
-python -m venv .venv
-source .venv/bin/activate #macOs/Linus
-venv\Scripts\activate     #Windows
-```
-
-3. Install dependencies:
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## Usage
-
-Run the main program:
+Recommendend
 
 ```bash
-python main.py
+python -m venv .venv
+source .venv/bin/activate # macOS/Linux
+# or
+venv\Scripts\activate # Windows
 ```
-
-## Menu Options
-
-1. **Open Trade** - Input pair, entry, stop loss, risk %, and direction (long/short). Confirm before saving.
-2. **Close Trade** - Select a trade, input exit price and optional notes. PnL and fees are calculated automatically.
-3. **View History** - Shows a table of all trades with color-coded PnL.
-4. **Exit** - Quit the program 
 
 ---
 
-## File Structure
+## ▶️ Run the App
+
+```bash
+python tui.py
+```
+
+---
+
+## 🧭 Navigation
+
+| Action                 | Key / Button | Description                                               |
+| ---------------------- | ------------ | --------------------------------------------------------- |
+| **Open Trade**         | Menu option  | Enter pair, risk %, entry, stop, direction                |
+| **Close Trade**        | Menu option  | Select an open trade, input exit price and optional notes |
+| **View History**       | Menu option  | View all trades, including PnL and fees                   |
+| **Toggle Delete Mode** | `D`          | Enable delete mode while in trade history                 |
+| **Confirm Delete**     | `Y`          | Confirm deletion of selected trade                        |
+| **Cancel Delete**      | `N`          | Cancel deletion                                           |
+| **Back**               | `B`          | Return to previous screen                                 |
+| **Exit**               | Menu option  | Quit the app                                              |
+
+## 📁 File Structure
 
 ```bash
 TCH-TradingCryptoHelper/
-│── calculator.py      # Position sizing and fee calculations
-│── trades.py          # CLI trade management
-│── storage.py         # JSON storage handling
-│── main.py            # Entry point
-│── trades.json        # Trade history (auto-generated)
-│── requirements.txt   # Dependencies
+│── tui.py                      # Entry point for TUI app
+│── core/
+│   ├── trades.py               # Core trade logic (open/close/delete)
+│   ├── calculator.py           # position sizing and computation 
+│── storage.py                  # JSON read/write helpers
+│── screens/
+│   ├── main_menu_screen.py     # Main menu
+│   ├── open_trade_screen.py    # Open trade UI
+│   ├── close_trade_screen.py   # Close trade UI
+│   ├── view_history_screen.py  # Trade history and delete mode
+│   ├── popup_message.py        # Reusable popup message widget
+│── trades.json                 # Saved trade data (auto-generated)
+│── requirements.txt
 │── README.md
 │── .gitignore
+
 ```
 
 ---
 
-## Example Trade Flow
+## 🧮 Example Trade Flow
 
-1. Open a Trade: 
+1. Open a Trade:
+
 ```yaml
 Pair: BTCUSDT
 Account size: 1000
@@ -95,14 +113,40 @@ Entry: 25000
 Stop Loss: 24500
 Direction: long
 ```
-2. Confirm the trade.
-3. Close the trade:
+
+Popup shows:
+
+```yaml
+✅ Trade opened!
+
+Pair: DOGEUSDT (LONG)
+Quantity: 2246
+Order Value: 548.58 USDT
+Required Leverage: 1.49x
+Risk per Trade: 19.50 USDT
+```
+
+2. Close the trade:
+
+Enter:
+
 ```yaml
 Exit price: 26000
 Note: TP hit.
 ```
-4. View trade history
 
-ID | Pair    | Dir  | Status | Entry | Exit  | Net Pnl | Notes  
---- | --- | --- | --- | --- | --- | --- | ---
- 1  | BTCUSDT | LONG | CLOSED | 25000 | 26000 | 99.00   | Tp hit 
+3. View trade history
+
+| ID | Pair    | Dir  | Status | Entry | Exit  | Net Pnl | Notes  |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|  1  | BTCUSDT | LONG | CLOSED | 25000 | 26000 | 99.00   | Tp hit |
+
+4. Delete Trades
+
+- Press `D` to enable delete mode
+- Select trade and press `Y` to confirm deletion
+
+## 🧑‍💻 Author
+
+Arthur J. Barbosa - AI Product Engineer & Trading Enthusiast
+Building AI-driven tools for productivity and finance.
