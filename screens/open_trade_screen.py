@@ -1,3 +1,7 @@
+# screens/open_trade_screen.py
+"""
+Screen to open a new trade.
+"""
 from textual.screen import Screen
 from textual.widgets import Button, Input, Static
 
@@ -43,13 +47,15 @@ class OpenTradeScreen(Screen):
                     stop_loss=float(self.stop_input.value),
                 )
 
-                lev = trade["required_leverage"]
-                if lev <= 3:
-                    style = "bold white on green"
-                elif 3 < lev <= 10:
-                    style = "bold black on yellow"
-                else:
-                    style = "bold white on red"
+                style_map = {
+                    "safe": "bold white on green",
+                    "watch": "bold black on #FFD700",
+                    "risky": "bold white on orange",
+                    "danger": "bold white on red",
+                }
+                style = style_map.get(
+                    trade.get("warning_level", "safe"), "bold white on blue"
+                )
 
                 # Build summary message
                 msg = (
@@ -57,13 +63,16 @@ class OpenTradeScreen(Screen):
                     f"Pair: {trade['pair']} ({trade['direction'].upper()})\n"
                     f"Quantity: {trade['quantity']:.4f}\n"
                     f"Order value: {trade['order_value']:.2f} USDT\n"
-                    f"Required Leverage: {lev:.1f}x"
+                    f"Required Leverage: {trade['required_leverage']:.1f}x\n"
                     f"Risk per trade: {trade['risk_amount']:.2f} USDT\n"
                     f"{trade['leverage_note']}\n\n"
+                    f"Liquidation Price: {trade['liquidation_price']:.2f}\n"
+                    f"{trade['liquidation_warning']}\n\n"
                     f"Fees → Maker: {trade['maker_fee']:.4f} | Taker: {trade['taker_fee']:.4f}"
                 )
 
-                self.mount(PopupMessage(msg, style=style))
+                self.mount(PopupMessage(msg, style=style, auto_close=0))
+
             except ValueError as e:
                 self.mount(
                     PopupMessage(

@@ -16,6 +16,7 @@ FEE_RATES = {"maker": 0.0002, "taker": 0.00055}
 
 
 def open_trade(
+    *,
     pair: str,
     direction: str,
     account_size: float,
@@ -24,19 +25,36 @@ def open_trade(
     stop_loss: float,
 ):
     """Create and save a new trade with calculated position sizing."""
-    results = calculate_quantity(account_size, risk_pct, entry, stop_loss)
+    results = calculate_quantity(
+        account_size=account_size,
+        risk_pct=risk_pct,
+        entry=entry,
+        stop_loss=stop_loss,
+        direction=direction,
+    )
 
     trades = load_trades()
     trade = {
-        "id": len(trades) + 1,
+        "id": (trades[-1]["id"] + 1) if trades else 1,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "pair": pair,
+        "direction": direction,
         "account_size": account_size,
         "risk_pct": risk_pct,
         "entry": entry,
         "stop_loss": stop_loss,
-        "direction": direction,
-        **results,
+        # calculator fields we want to persist & show in the TUI
+        "risk_amount": results["risk_amount"],
+        "quantity": results["quantity"],
+        "order_value": results["order_value"],
+        "required_leverage": results["required_leverage"],
+        "leverage_note": results["leverage_note"],
+        "liquidation_price": results["liquidation_price"],
+        "liquidation_warning": results["liquidation_warning"],
+        "warning_level": results["warning_level"],
+        "maker_fee": results["maker_fee"],
+        "taker_fee": results["taker_fee"],
+        # standard trade life cycle fields
         "status": "open",
         "exit_price": None,
         "gross_pnl": None,
@@ -96,9 +114,12 @@ def close_trade(trade_id: int, exit_price: float, notes: str = ""):
                     "notes": notes,
                 }
             )
+
             save_trades(trades)
-            return t
-        return None
+            return t  # ✅ success
+
+    # only return None *after checking all trades*
+    return None
 
 
 def delete_trade(trade_id: int) -> bool:
