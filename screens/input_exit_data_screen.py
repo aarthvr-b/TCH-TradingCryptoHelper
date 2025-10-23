@@ -27,20 +27,52 @@ class InputExitDataScreen(Screen):
         if event.button.id == "submit":
             try:
                 exit_price = float(self.exit_input.value)
-                notes = self.notes_input.value.strip() or None
+                notes = self.notes_input.value.strip() or ""
+
                 closed_trade = close_trade(
                     trade_id=self.trade["id"], exit_price=exit_price, notes=notes
                 )
+
                 if closed_trade:
-                    self.mount(
-                        PopupMessage(
-                            "✅ Trade closed successfully!",
-                            style="bold white on green",
-                            auto_close=3,
-                        )
+                    pnl = closed_trade.get("pnl", 0)
+                    gross = closed_trade.get("gross_pnl", 0)
+                    fees = closed_trade.get("fees_paid", 0)
+
+                    if pnl > 0:
+                        style = "bold white on green"
+                        emoji = "🚀"
+                        result_text = f"Profitable trade!: +${pnl:.2f} (Gross: +${gross:.2f}, Fees: -${fees:.2f})"
+                    elif pnl < 0:
+                        style = "bold white on red"
+                        emoji = "💀"
+                        result_text = f"Losing trade: -${-pnl:.2f} (Gross: -${-gross:.2f}, Fees: -${fees:.2f})"
+                    else:
+                        style = "bold white on yellow"
+                        emoji = "😐"
+                        result_text = f"Breakeven trade: $0.00 (Gross: ${gross:.2f}, Fees: -${fees:.2f})"
+
+                    # --- Summary Message ---
+                    msg = (
+                        f"{emoji} {result_text}\n\n"
+                        f"Pair: {closed_trade['pair']} ({closed_trade['direction'].upper()})\n"
+                        f"Entry: {closed_trade['entry']:.4f}\n"
+                        f"Exit: {closed_trade['exit_price']:.4f}\n"
+                        f"Quantity: {closed_trade.get('quantity', '-')}\n\n"
+                        f"Gross PnL: {gross:.2f} USDT\n"
+                        f"Fees Paid: {fees:.2f} USDT\n"
+                        f"Net PnL: {pnl:.2f} USDT\n\n"
+                        f"{'🟢 Well done!' if pnl > 0 else '🔴 Review your Strategies.' if pnl < 0 else '🟡 Flat outcome — good discipline!'}"
                     )
-                    self.app.pop_screen()  # Pop EnterExitDataScreen
-                    self.app.pop_screen()  # Pop CloseTradeScreen
+
+                    popup = PopupMessage(msg, style=style, auto_close=None)
+                    self.mount(popup)
+
+                    # def return_to_menu():
+                    #     self.app.pop_screen()  # Pop the popup message
+                    #     self.app.pop_screen()  # Return to menu
+
+                    # popup.set_timer(0.2, return_to_menu)
+
                 else:
                     self.mount(
                         PopupMessage(
