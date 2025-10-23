@@ -98,7 +98,7 @@ def close_trade(trade_id: int, exit_price: float, notes: str = ""):
             )
             save_trades(trades)
             return t
-        return None
+    return None
 
 
 def delete_trade(trade_id: int) -> bool:
