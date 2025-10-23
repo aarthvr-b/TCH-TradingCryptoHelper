@@ -19,6 +19,9 @@ class CloseTradeScreen(Screen):
     def on_mount(self):
         self.refresh_trades()
 
+    def on_resume(self) -> None:
+        self.refresh_trades()
+
     def refresh_trades(self):
         """Load the latest trades and repopulate the list view."""
         from core.trades import get_open_trades
